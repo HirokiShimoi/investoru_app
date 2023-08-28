@@ -26,8 +26,8 @@ class Migration(migrations.Migration):
             name='OrderLine',
             fields=[
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('reorder_point', models.IntegerField()),
                 ('product', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='myapp.product')),
+                ('reorder_point', models.IntegerField()),
             ],
         ),
         migrations.CreateModel(
