@@ -1,4 +1,5 @@
 from django.db import models
+from django.contrib.auth.models import AbstractUser
 
 class Product(models.Model):
     product_code = models.CharField(max_length=20, unique=True)  # 自社商品コード
@@ -22,3 +23,6 @@ class OrderLine(models.Model):
 
     def __str__(self):
         return f"{self.product.name} - {self.reorder_point}"
+
+class CustomUser(AbstractUser):
+    pass

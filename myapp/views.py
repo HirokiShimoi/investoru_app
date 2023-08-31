@@ -1,8 +1,9 @@
 from django.db.models import F
 from rest_framework import status, views,generics
+from django.contrib.auth.models import User
 from rest_framework.response import Response
 from .models import Product,Inventory,OrderLine
-from .serializers import ProductSerializer, InventorySerializer,OrderLineSerializer
+from .serializers import ProductSerializer, InventorySerializer,OrderLineSerializer,UserSerializer
 from django.shortcuts import get_object_or_404,render
 
 
@@ -78,7 +79,6 @@ class OrderLineDetailView(generics.RetrieveAPIView):
 
 class UnderOrderLine(views.APIView):
     def get(self,request):
-        print("This is a test.")
         underorderproducts =Inventory.objects.annotate(
             reorder_point = F('product__orderline__reorder_point')
         ).filter(current_stock__lte=F('reorder_point'))
@@ -87,3 +87,8 @@ class UnderOrderLine(views.APIView):
 
         serializer = InventorySerializer(underorderproducts, many=True)
         return Response(serializer.data)
+    
+class UserCreateView(generics.CreateAPIViews):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+

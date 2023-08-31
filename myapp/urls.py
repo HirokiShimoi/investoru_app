@@ -10,5 +10,6 @@ urlpatterns = [
     path('api/inventory/<str:product_code>/', views.ProductDetailView.as_view(), name='inventory-detail'),
     path('api/orderline/<str:product_code>/', views.ProductDetailView.as_view(), name='orderline-detail'),
     path('api/inventory/update/<str:product_code>/', views.InventoryUpdateView.as_view(), name='inventory-update'),
-
+    path('api/create_user/',UserCreateView.as_view(),name = 'user-create'),
+    
 ]
