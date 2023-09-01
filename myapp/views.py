@@ -9,11 +9,15 @@ from django.shortcuts import get_object_or_404,render
 
 class ProductListCreateView(views.APIView):
 
-    def get(self,request):
-        products = Product.objects.all()
+    def get(self, request):
+        category = request.GET.get('category', None)
+        if category:
+            products = Product.objects.filter(category=category)
+        else:
+            products = Product.objects.all()
         serializer = ProductSerializer(products, many=True)
         return Response(serializer.data)
-    
+      
     def post(self,request):
         serializer = ProductSerializer(data=request.data)
         if serializer.is_valid():
