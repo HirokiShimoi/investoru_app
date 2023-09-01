@@ -23,6 +23,3 @@ class OrderLine(models.Model):
 
     def __str__(self):
         return f"{self.product.name} - {self.reorder_point}"
-
-class CustomUser(AbstractUser):
-    pass
