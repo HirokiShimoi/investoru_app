@@ -18,7 +18,7 @@ class Inventory(models.Model):
         return f"{self.product.name} - {self.current_stock}"
 
 class OrderLine(models.Model):
-    product = models.ForeignKey(Product, on_delete=models.CASCADE, to_field='product_code')  # 商品ID（外部キー）
+    product = models.OneToOneField(Product, on_delete=models.CASCADE, to_field='product_code')  # 商品ID（外部キー）
     reorder_point = models.IntegerField()  # 発注点
 
     def __str__(self):

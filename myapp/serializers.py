@@ -8,15 +8,20 @@ class ProductSerializer(serializers.ModelSerializer):
         model = Product
         fields = '__all__'  
 
-class InventorySerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Inventory
-        fields = '__all__'  
-
 class OrderLineSerializer(serializers.ModelSerializer):
+    
     class Meta:
         model = OrderLine
         fields = '__all__'
+
+class InventorySerializer(serializers.ModelSerializer):
+    product = ProductSerializer(read_only=True)
+    reorder_point = serializers.IntegerField(source='product.orderline.reorder_point', read_only=True)
+
+
+    class Meta:
+        model = Inventory
+        fields = '__all__'  
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
