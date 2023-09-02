@@ -1,23 +1,30 @@
-from django.db.models import F
+from django.db.models import F,Q
 from rest_framework import status, views,generics
 from django.contrib.auth.models import User
 from rest_framework.response import Response
 from .models import Product,Inventory,OrderLine
 from .serializers import ProductSerializer, InventorySerializer,OrderLineSerializer,UserSerializer
 from django.shortcuts import get_object_or_404,render
+from rest_framework.pagination import PageNumberPagination
 
+
+class CustomPageNumberPagination(PageNumberPagination):
+    page_size = 20
+    page_size_query_param = 'page_size'
+    max_page_size = 1000
 
 class ProductListCreateView(views.APIView):
 
     def get(self, request):
-        category = request.GET.get('category', None)
+        category = request.GET.get('category',None)
+
         if category:
             products = Product.objects.filter(category=category)
         else:
             products = Product.objects.all()
         serializer = ProductSerializer(products, many=True)
         return Response(serializer.data)
-      
+    
     def post(self,request):
         serializer = ProductSerializer(data=request.data)
         if serializer.is_valid():
@@ -64,9 +71,22 @@ class InventoryUpdateView(views.APIView):
 class OrderLineListCreateView(views.APIView):
 
     def get(self,request):
-        orderline = OrderLine.objects.all()
-        serializer = OrderLineSerializer(orderline, many=True)
-        return Response(serializer.data)
+        paginator = CustomPageNumberPagination()
+
+        category = request.GET.get('category',None)
+        basequery = OrderLine.objects.annotate(
+            reorder_point = F('product__reorder_point')
+        ).filter(current_stock__lte=F('reorder_point'))
+
+        if category:
+            filtered_query = basequery.filter(product__category=category)
+        else:
+            filtered_query = basequery
+
+        result_page = paginator.paginate_queryset(filtered_query, request)
+        serializer = OrderLineSerializer(result_page, many=True)
+        return paginator.get_paginated_response(serializer.data)
+
     
     def post(self,request):
         serializer = OrderLineSerializer(data=request.data)
@@ -82,17 +102,26 @@ class OrderLineDetailView(generics.RetrieveAPIView):
 
 
 class UnderOrderLine(views.APIView):
-    def get(self,request):
-        underorderproducts =Inventory.objects.annotate(
-            reorder_point = F('product__orderline__reorder_point')
-        ).filter(current_stock__lte=F('reorder_point'))
+    def get(self, request):
+        paginator = CustomPageNumberPagination()
+        
+        category = request.GET.get('category', None)
+        base_query = Inventory.objects.annotate(
+            annotation_reorder_point=F('product__orderline__reorder_point')
+        ).filter(current_stock__lte=F('annotation_reorder_point'),product__is_active=True)
+        
+        if category:
+            filtered_query = base_query.filter(product__category=category)
+        else:
+            filtered_query = base_query
 
-        print("Under Order Products: ", underorderproducts.query)
-
-        serializer = InventorySerializer(underorderproducts, many=True)
-        return Response(serializer.data)
+        result_page = paginator.paginate_queryset(filtered_query, request)
+        serializer = InventorySerializer(result_page, many=True)
+        return paginator.get_paginated_response(serializer.data)
     
 class UserCreateView(generics.CreateAPIView):
+
     queryset = User.objects.all()
     serializer_class = UserSerializer
+
 
