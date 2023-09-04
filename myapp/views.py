@@ -59,7 +59,10 @@ class InventoryDetailView(generics.RetrieveAPIView):
 
 class InventoryUpdateView(views.APIView):
     def put(self,request,product_code):
+        print(f"Product code received: {product_code}")
+        print(f"Request data received: {request.data}")
         inventory = get_object_or_404(Inventory, product_code=product_code)
+        print(f"inventory data received: {inventory}")
         serializer = InventorySerializer(inventory, data=request.data)
         if serializer.is_valid():
             serializer.save()
@@ -86,13 +89,21 @@ class OrderLineListCreateView(views.APIView):
         result_page = paginator.paginate_queryset(filtered_query, request)
         serializer = OrderLineSerializer(result_page, many=True)
         return paginator.get_paginated_response(serializer.data)
-
     
     def post(self,request):
         serializer = OrderLineSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+    def patch(self,request,product_code):
+        orderline = get_object_or_404(OrderLine, product__product_code = product_code)
+        print(f"Product code received: {orderline}")
+        serializer = OrderLineSerializer(orderline, data=request.data,  partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
 class OrderLineDetailView(generics.RetrieveAPIView):
