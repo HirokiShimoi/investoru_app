@@ -9,10 +9,12 @@ from import_export.widgets import ForeignKeyWidget
 class ProductResource(resources.ModelResource):
     class Meta:
         model = Product
+        import_id_fields = ['product_code']
         
 @admin.register(Product)
 class ProductAdmin(ImportExportModelAdmin):
     resource_class = ProductResource
+    import_export_options = {'update': True}
 
 
 class InventoryResource(resources.ModelResource):
