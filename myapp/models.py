@@ -23,3 +23,13 @@ class OrderLine(models.Model):
 
     def __str__(self):
         return f"{self.product.name} - {self.reorder_point}"
+
+class SelectedItem(models.Model):
+    category = models.CharField(max_length=50)
+    inventory = models.IntegerField()
+    orderpoint = models.IntegerField()
+    product_code = models.CharField(max_length=20)
+    product_name = models.CharField(max_length=100)
+
+    def __str__(self):
+        return self.product_name

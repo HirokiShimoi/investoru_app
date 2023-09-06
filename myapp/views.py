@@ -2,8 +2,8 @@ from django.db.models import F,Q
 from rest_framework import status, views,generics
 from django.contrib.auth.models import User
 from rest_framework.response import Response
-from .models import Product,Inventory,OrderLine
-from .serializers import ProductSerializer, InventorySerializer,OrderLineSerializer,UserSerializer
+from .models import Product,Inventory,OrderLine,SelectedItem
+from .serializers import ProductSerializer, InventorySerializer,OrderLineSerializer,UserSerializer,SelectedItemSerializer
 from django.shortcuts import get_object_or_404,render
 from rest_framework.pagination import PageNumberPagination
 
@@ -136,3 +136,6 @@ class UserCreateView(generics.CreateAPIView):
     serializer_class = UserSerializer
 
 
+class SelectedItemView(generics.CreateAPIView):
+    queryset = SelectedItem.objects.all()
+    serializer_class = SelectedItemSerializer

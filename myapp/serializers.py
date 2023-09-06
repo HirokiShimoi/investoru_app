@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Inventory, Product, OrderLine
+from .models import Inventory, Product, OrderLine, SelectedItem
 from django.contrib.auth.models import User
 
 
@@ -34,3 +34,10 @@ class UserSerializer(serializers.ModelSerializer):
             password = validated_data['password'],
         )
         return user
+    
+class SelectedItemSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = SelectedItem
+        fields = '__all__'
+
+    
