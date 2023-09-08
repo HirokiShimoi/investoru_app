@@ -140,6 +140,11 @@ class SelectedItemView(generics.CreateAPIView):
     queryset = SelectedItem.objects.all()
     serializer_class = SelectedItemSerializer
 
+    def get(self, request, *args, **kwargs):
+        queryset = self.get_queryset()
+        serializer = SelectedItemSerializer(queryset, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
 class CommentView(views.APIView):
     def get(self, request, format=None):
         comments = Comment.objects.all()
