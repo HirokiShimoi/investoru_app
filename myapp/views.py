@@ -2,8 +2,8 @@ from django.db.models import F,Q
 from rest_framework import status, views,generics
 from django.contrib.auth.models import User
 from rest_framework.response import Response
-from .models import Product,Inventory,OrderLine,SelectedItem
-from .serializers import ProductSerializer, InventorySerializer,OrderLineSerializer,UserSerializer,SelectedItemSerializer
+from .models import Product,Inventory,OrderLine,SelectedItem,Comment
+from .serializers import ProductSerializer, InventorySerializer,OrderLineSerializer,UserSerializer,SelectedItemSerializer,CommentSerializer
 from django.shortcuts import get_object_or_404,render
 from rest_framework.pagination import PageNumberPagination
 
@@ -139,3 +139,16 @@ class UserCreateView(generics.CreateAPIView):
 class SelectedItemView(generics.CreateAPIView):
     queryset = SelectedItem.objects.all()
     serializer_class = SelectedItemSerializer
+
+class CommentView(views.APIView):
+    def get(self, request, format=None):
+        comments = Comment.objects.all()
+        serializer = CommentSerializer(comments, many=True)
+        return Response(serializer.data)
+    
+    def post(self, request, format=None):
+        serializer = CommentSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

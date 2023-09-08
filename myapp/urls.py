@@ -12,4 +12,5 @@ urlpatterns = [
     path('api/inventory/update/<str:product_code>/', views.InventoryUpdateView.as_view(), name='inventory-update'),
     path('api/create_user/', views.UserCreateView.as_view(),name = 'user-create'),
     path('api/selecteditem/', views.SelectedItemView.as_view(), name='selecteditem-create'),#チェック入った商品
+    path('api/comment/', views.CommentView.as_view(), name='comment'),#チェック入った商品
 ]

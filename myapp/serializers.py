@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Inventory, Product, OrderLine, SelectedItem
+from .models import Inventory, Product, OrderLine, SelectedItem,Comment
 from django.contrib.auth.models import User
 
 
@@ -39,5 +39,10 @@ class SelectedItemSerializer(serializers.ModelSerializer):
     class Meta:
         model = SelectedItem
         fields = '__all__'
+
+class CommentSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Comment
+        fields= '__all__'
 
     
