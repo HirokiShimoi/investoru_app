@@ -148,6 +148,7 @@ class SelectedItemView(generics.CreateAPIView):
     def delete(self, request, *args, **kwargs):
         try:
             delete_items = request.data.get('ids',[])
+            print("delete_items:", delete_items)
             SelectedItem.objects.filter(product_code__in = delete_items).delete()
             return Response ({'status': 'items deleted'}, status=status.HTTP_204_NO_CONTENT)
         except Exception as e:
