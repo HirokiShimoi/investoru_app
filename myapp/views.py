@@ -144,6 +144,14 @@ class SelectedItemView(generics.CreateAPIView):
         queryset = self.get_queryset()
         serializer = SelectedItemSerializer(queryset, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
+    
+    def delete(self, request, *args, **kwargs):
+        try:
+            delete_items = request.data.get('ids',[])
+            SelectedItem.objects.filter(product_code__in = delete_items).delete()
+            return Response ({'status': 'items deleted'}, status=status.HTTP_204_NO_CONTENT)
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 class CommentView(views.APIView):
     def get(self, request, format=None):
