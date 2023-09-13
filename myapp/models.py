@@ -41,3 +41,15 @@ class Comment(models.Model):
 
     def __str__(self):
         return f"{self.product.name} - {self.text[:20]}"
+
+
+class Todo(models.Model):
+    text = models.TextField()
+    created_at = models.DateField(auto_now_add=True)
+    due_date = models.DateField(null=True, blank=True)
+    is_completed = models.BooleanField(default=False)
+
+    def __str__(self):
+        status = "Completed" if self.is_completed else "Incomplete"
+        due_date_str = self.due_date.strftime('%Y-%m-%d') if self.due_date else "No due date"
+        return f"{self.text[:20]} ({status}, Due: {due_date_str})"
