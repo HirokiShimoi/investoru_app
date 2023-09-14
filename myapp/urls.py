@@ -14,4 +14,5 @@ urlpatterns = [
     path('api/selecteditem/', views.SelectedItemView.as_view(), name='selecteditem-create'),#チェック入った商品
     path('api/comment/', views.CommentView.as_view(), name='comment'),#チェック入った商品
     path('api/todo/',views.TodoView.as_view(), name='todo'),
+    path('api/todo/<int:pk>/',views.TodoView.as_view(), name='todo_detail'),
 ]
