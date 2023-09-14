@@ -17,12 +17,21 @@ class ProductListCreateView(views.APIView):
 
     def get(self, request):
         category = request.GET.get('category',None)
+        product_code = request.GET.get('product_code',None)
+        keyword = request.GET.get('keyword', None)
+
+        queryset = Product.objects.all()
 
         if category:
-            products = Product.objects.filter(category=category)
-        else:
-            products = Product.objects.all()
-        serializer = ProductSerializer(products, many=True)
+            queryset = queryset.filter(category=category)
+
+        if product_code:
+            queryset = queryset.filter(product_code=product_code)
+
+        if keyword:
+            queryset = queryset.filter(Q(name__icontains=keyword))
+
+        serializer = ProductSerializer(queryset, many=True)
         return Response(serializer.data)
     
     def post(self,request):
@@ -179,7 +188,8 @@ class TodoView(views.APIView):
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    
+
+class TodoDetailView(views.APIView):    
     def put(self,request,pk,format=None):
         todo = get_object_or_404(Todo, pk=pk)
         serializer = TodoSerializer(todo, data=request.data)
