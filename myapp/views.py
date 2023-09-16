@@ -13,24 +13,20 @@ class CustomPageNumberPagination(PageNumberPagination):
     page_size_query_param = 'page_size'
     max_page_size = 1000
 
-class ProductListCreateView(views.APIView):
+class ProductListCreateView(generics.ListCreateAPIView):
+    serializer_class = ProductSerializer
+    pagination_class = CustomPageNumberPagination
 
-    def get(self, request):
-        category = request.GET.get('category',None)
+    def get_queryset(self):
+        category = self.request.GET.get('category',None)
+        keyword = self.request.GET.get('keyword',None)
 
         if category:
-            products = Product.objects.filter(category=category)
+            return Product.objects.filter(category=category)
+        elif keyword:
+            return Product.objects.filter(name__icontains=keyword)
         else:
-            products = Product.objects.all()
-        serializer = ProductSerializer(products, many=True)
-        return Response(serializer.data)
-    
-    def post(self,request):
-        serializer = ProductSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            return Product.objects.all()
     
 class ProductDetailView(generics.RetrieveAPIView):
     queryset = Product.objects.all()
