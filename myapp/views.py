@@ -17,16 +17,32 @@ class ProductListCreateView(generics.ListCreateAPIView):
     serializer_class = ProductSerializer
     pagination_class = CustomPageNumberPagination
 
-    def get_queryset(self):
-        category = self.request.GET.get('category',None)
-        keyword = self.request.GET.get('keyword',None)
+    def get(self, request):
+        category = request.GET.get('category',None)
+        product_code = request.GET.get('product_code',None)
+        keyword = request.GET.get('keyword', None)
+
+        queryset = Product.objects.all()
 
         if category:
-            return Product.objects.filter(category=category)
-        elif keyword:
-            return Product.objects.filter(name__icontains=keyword)
-        else:
-            return Product.objects.all()
+            queryset = queryset.filter(category=category)
+
+        if product_code:
+            queryset = queryset.filter(product_code=product_code)
+
+        if keyword:
+            queryset = queryset.filter(Q(name__icontains=keyword))
+
+        serializer = ProductSerializer(queryset, many=True)
+        return Response(serializer.data)
+    
+    def post(self,request):
+        serializer = ProductSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
     
 class ProductDetailView(generics.RetrieveAPIView):
     queryset = Product.objects.all()
@@ -175,7 +191,8 @@ class TodoView(views.APIView):
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    
+
+class TodoDetailView(views.APIView):    
     def put(self,request,pk,format=None):
         todo = get_object_or_404(Todo, pk=pk)
         serializer = TodoSerializer(todo, data=request.data)
