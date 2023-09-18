@@ -27,6 +27,16 @@ class ProductListCreateView(generics.ListCreateAPIView):
             return Product.objects.filter(name__icontains=keyword)
         else:
             return Product.objects.all()
+        
+class IsActiveUpdateView(views.APIView):
+    def put(self,request,product_code):
+        product = get_object_or_404(Product, product_code=product_code)
+        serializer = ProductSerializer(product, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
 class ProductDetailView(generics.RetrieveAPIView):
     queryset = Product.objects.all()
