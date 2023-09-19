@@ -15,4 +15,5 @@ urlpatterns = [
     path('api/comment/', views.CommentView.as_view(), name='comment'),#チェック入った商品
     path('api/todo/',views.TodoView.as_view(), name='todo'),
     path('api/todo/<int:pk>/',views.TodoDetailView.as_view(), name='todo_detail'),
+    path('api/update_inventory/',views.UpdateInventoryCSV.as_view(), name='update_inventory'),
 ]

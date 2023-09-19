@@ -6,6 +6,9 @@ from .models import Product,Inventory,OrderLine,SelectedItem,Comment,Todo
 from .serializers import ProductSerializer, InventorySerializer,OrderLineSerializer,UserSerializer,SelectedItemSerializer,CommentSerializer,TodoSerializer
 from django.shortcuts import get_object_or_404,render
 from rest_framework.pagination import PageNumberPagination
+import csv
+from io import TextIOWrapper
+from django.http import JsonResponse
 
 
 class CustomPageNumberPagination(PageNumberPagination):
@@ -205,3 +208,48 @@ class TodoDetailView(views.APIView):
         todo = get_object_or_404(Todo, pk=pk)
         todo.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
+    
+class UpdateInventoryCSV(views.APIView):
+    def put(self,request):
+        try:
+            csv_file = request.FILES['file']
+            csv_file = TextIOWrapper(csv_file.file, encoding='utf-8')
+            csv_reader = csv.reader(csv_file)
+
+            updated_inventories = []
+            created_products = []
+            print("Reading CSV file")
+            for row in csv_reader:
+                print(f"Processing row: {row}")
+                product_code = row[2]
+                product_name = row[3]
+                current_stock = int(row[11])
+
+                product, created = Product.objects.get_or_create(
+                    product_code=product_code,
+                    defaults={'name': product_name}
+                )
+
+                if created:
+                    created_products.append(product)
+
+                inventory, _ = Inventory.objects.get_or_create(
+                    product=product,
+                    defaults={'current_stock': current_stock}
+                )
+                inventory.current_stock = current_stock
+                updated_inventories.append(inventory) 
+                print("CSV file received:", csv_file)
+                print("Created products:", created_products)
+                print("Updated inventories:", updated_inventories)
+
+            if created_products:
+                Product.objects.bulk_create(created_products)
+
+            if updated_inventories:
+                Inventory.objects.bulk_update(updated_inventories, ['current_stock'])
+        
+            return JsonResponse({'status': 'success', 'message': 'CSV uploaded and inventory updated.'})
+            
+        except Exception as e:
+            return JsonResponse({'status': 'error', 'message': str(e)})
