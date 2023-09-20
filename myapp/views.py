@@ -212,9 +212,7 @@ class UpdateInventoryCSV(views.APIView):
 
             updated_inventories = []
             created_products = []
-            print("Reading CSV file")
             for row in csv_reader:
-                print(f"Processing row: {row}")
                 product_code = row[2]
                 product_name = row[3]
                 current_stock = int(row[11])
@@ -233,9 +231,6 @@ class UpdateInventoryCSV(views.APIView):
                 )
                 inventory.current_stock = current_stock
                 updated_inventories.append(inventory) 
-                print("CSV file received:", csv_file)
-                print("Created products:", created_products)
-                print("Updated inventories:", updated_inventories)
 
             if created_products:
                 Product.objects.bulk_create(created_products)
