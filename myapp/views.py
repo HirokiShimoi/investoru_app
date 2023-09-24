@@ -242,3 +242,35 @@ class UpdateInventoryCSV(views.APIView):
             
         except Exception as e:
             return JsonResponse({'status': 'error', 'message': str(e)})
+        
+
+class UpdateProductCSV(views.APIView):
+    def put(self, request):
+        try:
+            csv_file = request.FILES['file']
+            csv_file = TextIOWrapper(csv_file.file, encoding='utf-8')
+            csv_reader = csv.reader(csv_file)
+
+            updated_products = []
+            for row in csv_reader:
+                product_code = row[2]  # C 列
+                product_name = row[3]  # D 列
+
+                product, created = Product.objects.get_or_create(
+                    product_code=product_code,
+                    defaults={'name': product_name}
+                )
+
+                if not created:
+                    # 既存の製品の名前をアップデートする場合
+                    product.name = product_name
+                    updated_products.append(product) 
+
+            # 既存の製品エントリを更新する場合
+            if updated_products:
+                Product.objects.bulk_update(updated_products, ['name'])
+        
+            return JsonResponse({'status': 'success', 'message': 'CSV uploaded and products updated.'})
+            
+        except Exception as e:
+            return JsonResponse({'status': 'error', 'message': str(e)})
