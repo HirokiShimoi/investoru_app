@@ -9,6 +9,8 @@ from rest_framework.pagination import PageNumberPagination
 import csv
 from io import TextIOWrapper
 from django.http import JsonResponse
+from django.contrib.auth import authenticate, login
+
 
 
 class CustomPageNumberPagination(PageNumberPagination):
@@ -274,3 +276,29 @@ class UpdateProductCSV(views.APIView):
             
         except Exception as e:
             return JsonResponse({'status': 'error', 'message': str(e)})
+        
+
+def user_login(request):
+    if request.method == "POST":
+        username = request.POST.get('username')
+        password = request.POST.get('password')
+        user = authenticate(request, username=username, password=password)
+        if user is not None:
+            login(request, user)
+            return JsonResponse({"status": "success", "message": "Login successful"})
+        else:
+            return JsonResponse({"status": "error", "message": "Invalid credentials"})
+    return JsonResponse({"status": "error", "message": "Invalid request method"})
+
+def create_user(request):
+    if request.method == "POST":
+        username = request.POST.get('username')
+        password = request.POST.get('password')
+
+        if User.objects.filter(username=username).exists():
+            return JsonResponse({"status": "error", "message": "Username already exists"})
+
+        user = User.objects.create_user(username=username, password=password)
+        return JsonResponse({"status": "success", "message": "User created successfully"})
+
+    return JsonResponse({"status": "error", "message": "Invalid request method"})
