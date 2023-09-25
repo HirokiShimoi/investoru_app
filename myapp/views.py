@@ -10,6 +10,7 @@ import csv
 from io import TextIOWrapper
 from django.http import JsonResponse
 from django.contrib.auth import authenticate, login
+from rest_framework.decorators import api_view
 
 
 
@@ -277,18 +278,18 @@ class UpdateProductCSV(views.APIView):
         except Exception as e:
             return JsonResponse({'status': 'error', 'message': str(e)})
         
-
+@api_view(['POST'])
 def user_login(request):
     if request.method == "POST":
-        username = request.POST.get('username')
-        password = request.POST.get('password')
+        username = request.data.get('username')
+        password = request.data.get('password')
         user = authenticate(request, username=username, password=password)
         if user is not None:
             login(request, user)
             return JsonResponse({"status": "success", "message": "Login successful"})
         else:
             return JsonResponse({"status": "error", "message": "Invalid credentials"})
-    return JsonResponse({"status": "error", "message": "Invalid request method"})
+    return Response({"status": "error", "message": "Invalid request method"})
 
 def create_user(request):
     if request.method == "POST":
