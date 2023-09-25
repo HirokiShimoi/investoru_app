@@ -53,3 +53,4 @@ class Todo(models.Model):
         status = "Completed" if self.is_completed else "Incomplete"
         due_date_str = self.due_date.strftime('%Y-%m-%d') if self.due_date else "No due date"
         return f"{self.text[:20]} ({status}, Due: {due_date_str})"
+    
