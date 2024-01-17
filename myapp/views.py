@@ -11,6 +11,7 @@ from io import TextIOWrapper
 from django.http import JsonResponse
 from django.contrib.auth import authenticate, login
 from rest_framework.decorators import api_view
+from rest_framework.authtoken.models import Token
 
 
 
@@ -286,10 +287,13 @@ def user_login(request):
         user = authenticate(request, username=username, password=password)
         if user is not None:
             login(request, user)
-            return JsonResponse({"status": "success", "message": "Login successful"})
+            token, created = Token.objects.get_or_create(user=user)
+            return JsonResponse({"status": "success", "message": "Login successful", "token": token.key})
         else:
             return JsonResponse({"status": "error", "message": "Invalid credentials"})
     return Response({"status": "error", "message": "Invalid request method"})
+
+
 
 def create_user(request):
     if request.method == "POST":
@@ -303,3 +307,12 @@ def create_user(request):
         return JsonResponse({"status": "success", "message": "User created successfully"})
 
     return JsonResponse({"status": "error", "message": "Invalid request method"})
+
+@api_view(['POST'])
+def verify_token(request):
+    token_key = request.data.get('token')
+    try:
+        token = Token.objects.get(key=token_key)
+        return JsonResponse({"isValid": True})
+    except Token.DoesNotExist:
+        return JsonResponse({"isValid": False})

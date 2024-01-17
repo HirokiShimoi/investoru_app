@@ -19,5 +19,6 @@ urlpatterns = [
     path('api/update_inventory/',views.UpdateInventoryCSV.as_view(), name='update_inventory'),
     path('api/update_product/',views.UpdateProductCSV.as_view(), name='update_product'),
     path('api/user_login/',views.user_login,name='user_login'),
-    path('api/user_create/',views.create_user,name='user_create')
+    path('api/user_create/',views.create_user,name='user_create'),
+    path('api/verify-token', views.verify_token),
 ]

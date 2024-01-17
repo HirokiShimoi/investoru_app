@@ -26,7 +26,7 @@ SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'your-default-secret-key')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
-ALLOWED_HOSTS = ["18.176.61.148"]
+ALLOWED_HOSTS = ["54.248.34.100"]
 
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'import_export',
     'rest_framework',
     'corsheaders',
+    'rest_framework.authtoken',
 ]
 
 MIDDLEWARE = [
@@ -82,10 +83,15 @@ WSGI_APPLICATION = 'investory_app.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'mydatabase',  # 作成したデータベース名
+        'USER': 'myuser',      # 作成したPostgreSQLユーザー名
+        'PASSWORD': 'mypassword',  # ユーザーのパスワード
+        'HOST': 'localhost',   # ローカルホストを使用するか、またはEC2インスタンスのパブリックIPアドレスまたはDNS名
+        'PORT': '5432',        # デフォルトのPostgreSQLポート
     }
 }
+
 
 
 # Password validation
